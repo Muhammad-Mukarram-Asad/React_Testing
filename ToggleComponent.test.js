@@ -1,5 +1,9 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { useState, useEffect } from 'react';
+import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
+
 import Toggle from './Toggle';
 
 describe('Toggle Component', () => {
@@ -13,8 +17,8 @@ describe('Toggle Component', () => {
     // Below is the simple demo of a falsy test case:
 
     // it("Should be false", () => {
-    //     const testName = "Mukii";
-    //     expect(testName).toBe("Asad");
+    //     const testName = "Waqas Ausaf";
+    //     expect(testName).toBe("Asad Ullah");
     // })
 
     // Below is the original test case of Toggle Component for checking the text
@@ -53,8 +57,108 @@ describe('Toggle Component', () => {
   debug();
 
   const element = queryByText('This Text is toggle text');
-  expect(element.length).toBeNull();
+  expect(element.length).toBe(undefined);
 });
 
   
+});
+
+
+// Another example taken  from codecademy:
+
+const GreetingForm = () => {
+  return (
+    <form>
+      <label role="textbox" htmlFor="greeting">
+        Greeting:
+      </label>
+      <input type="text" id="greeting" />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+test('should show text content as Hello!', () => {
+  render(<GreetingForm />);
+  
+  const textbox = screen.getByRole('textbox', { name: 'Greeting:' });
+  const button = screen.getByRole('button', { name: 'Submit' });
+  
+  // Simulate typing 'Hello!'
+  fireEvent.change(textbox, { target: { value: 'Hello!' } });
+  // Simulate clicking the button
+  fireEvent.click(button);
+  
+  // Assert textbox has text content 'Hello!'
+  expect(textbox).toHaveValue('Hello!');
+});
+
+const Header1 = () => {
+  return <h1 className='title'>I am a header</h1>
+};
+
+test('should show the button as disabled', () => {
+  // render Button component
+  render(<Header1 />);
+  // Extract header
+  const header = screen.getByRole('heading');
+  // Use jest-dom assertions
+  expect(header).toBeInTheDocument();
+  expect(header).toHaveTextContent('I am a header');
+  expect(header).toHaveClass('title');
+});
+
+
+
+const Header2 = () => {
+  const [text, setText] = useState('Hello World!');
+  
+  // Changes header text after interval of 500ms
+  useEffect(() => {
+    setTimeout(() => {
+      setText('Goodbye!');
+    }, 500);
+  });
+  
+  return <h1>{text}</h1>;
+};
+
+test('should show text content as Goodbye', async () => {
+  // Render App
+  render(<Header2 />);
+  // Asynchronously extract header with new text
+  const header = await screen.findByText('Goodbye!');
+  // Assert header to have text 'Goodbye!'
+  expect(header).toBeInTheDocument();
+});
+
+const GreetingForm1 = () => {
+  return(
+    <form>
+      <label role="box" htmlFor="greeting">
+        Greeting:
+      </label>
+      <input type="text" id="greeting" />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+test('should show text content as Hello!', () => {
+  render(<GreetingForm1 />);
+  // const textbox = screen.getByRole('box');
+  // const button = screen.getByRole('button');
+
+  const textbox = screen.getByRole('textbox', { name: 'Greeting:' });
+  const button = screen.getByRole('button', { name: 'Submit' });
+  
+  // Simulate typing 'Hello!'
+  userEvent.type(textbox, 'Hello!');
+  fireEvent.change(textbox, { target: { value: 'Hello!' } }); // Trigger the change event
+  
+  // Simulate clicking button
+  userEvent.click(button);
+  
+  // Assert textbox has text content 'Hello!'
+  expect(textbox).toHaveValue('Hello!');
 });
